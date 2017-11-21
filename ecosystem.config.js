@@ -13,7 +13,7 @@ module.exports = {
             ref: 'origin/master',
             repo: 'https://github.com/eboninger/boninger.git',
             path: '/home/ubuntu/boninger',
-            'post-deploy': 'npm install && pm2 startOrRestart ecosystem.config.js'
+            'post-deploy': 'npm install && npm run build && pm2 startOrRestart ecosystem.config.js'
         }
     }
 };
