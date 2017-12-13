@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const http = require('http');
 const app = express();
-// const cors = require('cors');
+const cors = require('cors');
 const jwt = require('express-jwt');
 const jwks = require('jwks-rsa');
 
@@ -13,7 +13,7 @@ const api = require('./server/routes/api');
 // Parsers
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(cors());
+app.use(cors());
 
 const authCheck = jwt({
   secret: jwks.expressJwtSecret({
