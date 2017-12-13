@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from './../../auth/auth.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import * as aws from 'aws-sdk';
 
 import 'rxjs/add/operator/map';
 
