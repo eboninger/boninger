@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./nav.component.css']
 })
 export class NavComponent implements OnInit {
+  public navbarCollapsed = false;
+
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {}
