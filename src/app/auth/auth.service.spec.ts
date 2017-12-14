@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   beforeEach(() => {
+    // tslint:disable-next-line:prefer-const
     let store = {};
     TestBed.configureTestingModule({
       providers: [AuthService]
