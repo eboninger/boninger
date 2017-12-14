@@ -89,7 +89,7 @@ describe('CallbackComponent', () => {
     expect(authService.setAuthenticated).toHaveBeenCalledWith(true);
     expect(router.navigateByUrl).toHaveBeenCalledWith('');
     expect(localStorage.getItem('access_token')).toBe('token');
-    let storeExpTimeExists = !!localStorage.getItem('expires_at');
+    const storeExpTimeExists = !!localStorage.getItem('expires_at');
     expect(storeExpTimeExists).toBe(true);
   });
 });
