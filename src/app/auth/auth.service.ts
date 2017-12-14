@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AUTH_CONFIG } from './auth-config';
-import { Router } from '@angular/router';
 import { CognitoAuth } from 'amazon-cognito-auth-js/dist/amazon-cognito-auth';
 import { Observable } from 'rxjs/Observable';
 
@@ -19,7 +18,7 @@ export class AuthService {
   public authenticated: boolean;
   private authenticated$: BehaviorSubject<boolean>;
 
-  constructor(private router: Router) {
+  constructor() {
     this.authenticated$ = new BehaviorSubject<boolean>(!!localStorage.getItem('access_token'));
     this.authenticated$.subscribe(val => (this.authenticated = val));
   }
@@ -28,14 +27,16 @@ export class AuthService {
     this.authenticated$.next(isAuthenticated);
   }
 
-  login() {
+  login(): void {
     // Auth0 authorize request
     this.auth.getSession();
   }
 
-  logout() {
+  logout(): void {
     // Remove tokens and profile and update login status subject
-    this.auth.signout();
+    this.auth.signOut();
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('expires_at');
     this.authenticated$.next(false);
   }
 }

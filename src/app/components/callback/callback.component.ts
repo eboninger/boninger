@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from './../../auth/auth.service';
+import { FragmentService } from './../../services/fragment.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as aws from 'aws-sdk';
 
@@ -15,28 +16,29 @@ import 'rxjs/add/operator/map';
   styles: []
 })
 export class CallbackComponent implements OnInit {
-  constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private fragmentService: FragmentService
+  ) {}
 
   ngOnInit() {
     let authenticated = false;
     this.route.fragment.subscribe(val => {
-      const params = val.split('&');
-      const paramsMap = params.map(param => param.split('='));
-      paramsMap.map(map => {
-        if (map[0] === 'expires_in') {
-          const expTime = +map[1] * 1000 + Date.now();
-          localStorage.setItem('expires_at', JSON.stringify(expTime));
-        }
+      const paramsMap = this.fragmentService.parseFragment(val);
+      if (paramsMap['expires_in']) {
+        const expTime = +paramsMap['expires_in'] * 1000 + Date.now();
+        localStorage.setItem('expires_at', JSON.stringify(expTime));
+      }
 
-        if (map[0] === 'access_token') {
-          authenticated = true;
-          localStorage.setItem('access_token', map[1]);
-          this.authService.setAuthenticated(true);
-          this.router.navigateByUrl('');
-        }
-      });
+      if (paramsMap['access_token']) {
+        authenticated = true;
+        localStorage.setItem('access_token', paramsMap['access_token']);
+        this.authService.setAuthenticated(true);
+        this.router.navigateByUrl('');
+      }
       if (!authenticated) {
-        alert('authenticate failed');
         this.router.navigateByUrl('register');
       }
     });
