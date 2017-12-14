@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { NavComponent } from './nav.component';
 import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 describe('NavComponent', () => {
   class RouterStub {
@@ -23,7 +24,8 @@ describe('NavComponent', () => {
     async(() => {
       TestBed.configureTestingModule({
         declarations: [NavComponent],
-        providers: [AuthService, { provide: Router, useClass: RouterStub }]
+        providers: [AuthService, { provide: Router, useClass: RouterStub }],
+        imports: [NgbModule]
       }).compileComponents();
     })
   );
@@ -32,8 +34,6 @@ describe('NavComponent', () => {
     fixture = TestBed.createComponent(NavComponent);
     component = fixture.componentInstance;
     authService = fixture.debugElement.injector.get(AuthService);
-    de = fixture.debugElement.query(By.css('nav'));
-    el = !!de ? de.nativeElement : undefined;
     spyOn(authService, 'authenticated').and.returnValue(authenticated);
     fixture.detectChanges();
   });
@@ -49,7 +49,7 @@ describe('NavComponent', () => {
   it('should show when authenticated is true', () => {
     authenticated = true;
     fixture.detectChanges();
-    de = fixture.debugElement.query(By.css('nav'));
+    de = fixture.debugElement.query(By.css('header'));
     el = !!de ? de.nativeElement : undefined;
     expect(el.hidden).toBe(false);
   });
