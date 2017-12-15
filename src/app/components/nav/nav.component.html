@@ -1,4 +1,4 @@
-<header *ngIf="authService.authenticated" class="navbar navbar-expand-lg navbar-light bg-light">
+<header class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" (click)="navbarCollapsed = true" routerLink="/home">my<span id="billboard" >billboard</span></a>
 
     <button class="navbar-toggler navbar-toggler-right" type="button" (click)="navbarCollapsed = !navbarCollapsed" [attr.aria-expanded]="!navbarCollapsed"
