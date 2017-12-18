@@ -40,3 +40,6 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+/src/app/auth/auth-config.ts
+/server/routes/spotify.js

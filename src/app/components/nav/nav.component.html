@@ -1,3 +1,22 @@
-<p>
-  nav works!
-</p>
+<header class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" (click)="navbarCollapsed = true" routerLink="/home">my<span id="billboard" >billboard</span></a>
+
+    <button class="navbar-toggler navbar-toggler-right" type="button" (click)="navbarCollapsed = !navbarCollapsed" [attr.aria-expanded]="!navbarCollapsed"
+        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="navbar-collapse" [ngbCollapse]="navbarCollapsed" id="navbarContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" routerLink="/home" (click)="navbarCollapsed = true">Home</a>
+            </li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item">
+                <a class="nav-link" href="/" (click)="logout()">Account</a>
+            </li>
+        </ul>
+    </div>
+</header>
