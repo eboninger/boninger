@@ -15,7 +15,7 @@ const appRoutes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(appRoutes, { enableTracing: false })],
+  imports: [RouterModule.forRoot(appRoutes, { enableTracing: true })],
   exports: [RouterModule],
   providers: [AuthGuard, RegisterGuard]
 })

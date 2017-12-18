@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const request = require('request');
 const aws = require('aws-sdk');
+const spotify = require('./spotify').SPOTIFY_CONFIG;
 
 const ipfilter = require('express-ipfilter').IpFilter;
 const querystring = require('querystring');
@@ -32,9 +33,9 @@ router.get('/login', function(req, res) {
     'https://accounts.spotify.com/authorize?' +
       querystring.stringify({
         response_type: 'code',
-        client_id: 'f85c4d7a952c4cc5a1f915a0734c76e6',
-        scope: 'user-top-read user-read-private',
-        redirect_uri: 'http://localhost:3000/api/callback',
+        client_id: spotify.CLIENT_ID,
+        scope: spotify.SCOPE,
+        redirect_uri: spotify.REDIRECT_URI,
         state: state
       })
   );
@@ -51,11 +52,9 @@ router.get('/callback', function(req, res) {
     res.clearCookie(stateKey);
     const authOptions = {
       url: 'https://accounts.spotify.com/api/token',
-      form: { code: code, redirect_uri: 'http://localhost:3000/api/callback', grant_type: 'authorization_code' },
+      form: { code: code, redirect_uri: spotify.REDIRECT_URI, grant_type: 'authorization_code' },
       headers: {
-        Authorization:
-          'Basic ' +
-          new Buffer('f85c4d7a952c4cc5a1f915a0734c76e6' + ':' + '448793fa018343bda05cd4db5e71cd38').toString('base64')
+        Authorization: 'Basic ' + new Buffer(spotify.CLIENT_ID + ':' + spotify.SECRET).toString('base64')
       },
       json: true
     };

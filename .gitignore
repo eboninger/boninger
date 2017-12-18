@@ -42,3 +42,4 @@ testem.log
 Thumbs.db
 
 /src/app/auth/auth-config.ts
+/server/routes/spotify.js
