@@ -6,14 +6,15 @@ const aws = require('aws-sdk');
 const spotify = require('./spotify').SPOTIFY_CONFIG;
 
 const ipfilter = require('express-ipfilter').IpFilter;
+const IpDeniedError = require('express-ipfilter').IpDeniedError;
 const querystring = require('querystring');
 const jwt = require('jwt-express');
 aws.config.update({ region: 'us-east-1' });
 const stateKey = 'spotify_auth_state';
 const dynamodb = new aws.DynamoDB();
 
-// router.use(ipfilter(['127.0.0.1'], { mode: 'allow' }));
-router.use(jwt.init('secret'));
+router.use(ipfilter(['34.237.114.155'], { mode: 'allow' }));
+router.use(jwt.init(spotify.X));
 
 var generateRandomString = function(length) {
   var text = '';
@@ -73,6 +74,8 @@ router.get('/callback', function(req, res) {
         request.get(options, function(error, response, body) {
           if (!body.uri) {
             res.direct('/home?error=no_user_data');
+          } else if (!spotify.ACCEPT.includes(body.id)) {
+            res.sendStatus(403);
           } else {
             const params = {
               Key: { spotify_uri: { S: body.uri } },
@@ -179,6 +182,8 @@ router.get('/songs', jwt.active(), function(req, res) {
 router.use(function(err, req, res, next) {
   if (err.name === 'JWTExpressError') {
     res.send(false);
+  } else if (err instanceof IpDeniedError) {
+    res.sendStatus(403);
   } else {
     next(err);
   }
