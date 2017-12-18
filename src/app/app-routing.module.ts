@@ -6,9 +6,10 @@ import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
 
 import { AuthGuard } from './guards/auth.guard';
+import { RegisterGuard } from './guards/register.guard';
 
 const appRoutes: Routes = [
-  { path: 'register', component: RegisterComponent },
+  { path: 'register', component: RegisterComponent, canActivate: [RegisterGuard] },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: '', redirectTo: '/home', pathMatch: 'full' }
 ];
@@ -16,6 +17,6 @@ const appRoutes: Routes = [
 @NgModule({
   imports: [RouterModule.forRoot(appRoutes, { enableTracing: false })],
   exports: [RouterModule],
-  providers: [AuthGuard]
+  providers: [AuthGuard, RegisterGuard]
 })
 export class AppRoutingModule {}

@@ -6,15 +6,15 @@ import 'rxjs/add/observable/of';
 import { AuthService } from '../services/auth.service';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class RegisterGuard implements CanActivate {
   constructor(private authService: AuthService, private router: Router) {}
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | Promise<boolean> | boolean {
     return this.authService.hasToken().switchMap(bool => {
-      if (!bool) {
-        this.router.navigateByUrl('register');
+      if (bool) {
+        this.router.navigateByUrl('');
         return Observable.of(false);
       }
       return Observable.of(true);

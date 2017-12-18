@@ -4,8 +4,6 @@ const path = require('path');
 const http = require('http');
 const app = express();
 const cors = require('cors');
-const jwt = require('express-jwt');
-const jwks = require('jwks-rsa');
 const cookieParser = require('cookie-parser');
 
 // API file for interacting with MongoDB
@@ -16,18 +14,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors());
-
-// const authCheck = jwt({
-//   secret: jwks.expressJwtSecret({
-//     cache: true,
-//     rateLimit: true,
-//     jwksRequestsPerMinute: 5,
-//     jwksUri: 'https://mybillboard.auth0.com/.well-known/jwks.json'
-//   }),
-//   audience: 'http://localhost:3001',
-//   issuer: 'https://mybillboard.auth0.com',
-//   algorithms: ['RS256']
-// });
 
 // Angular DIST output folder
 app.use(express.static(path.join(__dirname, 'dist')));

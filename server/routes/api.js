@@ -107,12 +107,7 @@ router.get('/callback', function(req, res) {
               const token = res.jwt({
                 spotify_uri: body.uri
               });
-              res.redirect(
-                '/home?' +
-                  querystring.stringify({
-                    userKey: userKey
-                  })
-              );
+              res.redirect('/home');
             });
           }
         });
@@ -121,13 +116,13 @@ router.get('/callback', function(req, res) {
   }
 });
 
-router.get('/user', jwt.active(), function(req, res) {
-  res.send('hello');
+router.get('/authorize', jwt.active(), function(req, res) {
+  res.send(true);
 });
 
 router.use(function(err, req, res, next) {
   if (err.name === 'JWTExpressError') {
-    res.redirect('/api/login');
+    res.send(false);
   } else {
     next(err);
   }
