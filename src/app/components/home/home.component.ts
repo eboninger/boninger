@@ -7,8 +7,10 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  results: string[];
+  tracks: Song[];
   constructor(private http: HttpClient) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.http.get('/api/songs').subscribe((res: Array<Song>) => (this.tracks = res));
+  }
 }

@@ -74,28 +74,13 @@ router.get('/callback', function(req, res) {
           if (!body.uri) {
             res.direct('/home?error=no_user_data');
           } else {
-            const userKey = generateRandomString(30);
             const params = {
-              Key: {
-                spotify_uri: {
-                  S: body.uri
-                }
-              },
-              ExpressionAttributeNames: {
-                '#SL': 'song_list',
-                '#UK': 'user_key'
-              },
-              ExpressionAttributeValues: {
-                ':sl': {
-                  S: 'new mock list'
-                },
-                ':uk': {
-                  S: userKey
-                }
-              },
+              Key: { spotify_uri: { S: body.uri } },
+              ExpressionAttributeNames: { '#RT': 'refresh_token' },
+              ExpressionAttributeValues: { ':rt': { S: refresh_token } },
               ReturnConsumedCapacity: 'TOTAL',
               TableName: 'billboard_user',
-              UpdateExpression: 'SET #SL = :sl, #UK = :uk'
+              UpdateExpression: 'SET #RT = :rt'
             };
             dynamodb.updateItem(params, (err, data) => {
               if (err) {
@@ -104,7 +89,8 @@ router.get('/callback', function(req, res) {
                 console.log(data);
               }
               const token = res.jwt({
-                spotify_uri: body.uri
+                spotify_uri: body.uri,
+                access_token: access_token
               });
               res.redirect('/home');
             });
@@ -117,6 +103,77 @@ router.get('/callback', function(req, res) {
 
 router.get('/authorize', jwt.active(), function(req, res) {
   res.send(true);
+});
+
+router.get('/songs', jwt.active(), function(req, res) {
+  const token = req.jwt;
+  const params = { Key: { spotify_uri: { S: token.payload.spotify_uri } }, TableName: 'billboard_user' };
+  dynamodb.getItem(params, (err, data) => {
+    if (data.Item.song_list.L.length <= 0) {
+      const options = {
+        url: 'https://api.spotify.com/v1/me/top/tracks?limit=50&time_range=short_term',
+        headers: { Authorization: 'Bearer ' + token.payload.access_token },
+        json: true
+      };
+      request.get(options, (err, res, body) => {
+        const song_list = body.items.map(item => ({
+          M: {
+            album: {
+              M: {
+                url: { S: item.album.external_urls.spotify },
+                name: { S: item.album.name },
+                small_image: { S: item.album.images[2].url },
+                medium_image: { S: item.album.images[1].url },
+                large_image: { S: item.album.images[0].url }
+              }
+            },
+            artists: {
+              L: item.artists.map(artist => ({
+                M: { url: { S: artist.external_urls.spotify }, name: { S: artist.name } }
+              }))
+            },
+            url: { S: item.external_urls.spotify },
+            is_playable: { BOOL: item.is_playable },
+            name: { S: item.name }
+          }
+        }));
+        const params = {
+          Key: { spotify_uri: { S: token.payload.spotify_uri } },
+          ExpressionAttributeNames: { '#SL': 'song_list' },
+          ExpressionAttributeValues: { ':sl': { L: song_list } },
+          ReturnConsumedCapacity: 'TOTAL',
+          TableName: 'billboard_user',
+          UpdateExpression: 'SET #SL = :sl'
+        };
+        dynamodb.updateItem(params, (err, data) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(data);
+          }
+        });
+      });
+    } else {
+      res.send(
+        data.Item.song_list.L.map(song => ({
+          name: song.M.name.S,
+          is_playable: song.M.is_playable.BOOL,
+          artists: song.M.artists.L.map(artist => ({
+            name: artist.M.name.S,
+            url: artist.M.url.S
+          })),
+          album: {
+            name: song.M.album.M.name.S,
+            large_image: song.M.album.M.large_image.S,
+            small_image: song.M.album.M.small_image.S,
+            medium_image: song.M.album.M.medium_image.S,
+            url: song.M.album.M.url.S
+          },
+          url: song.M.url
+        }))
+      );
+    }
+  });
 });
 
 router.use(function(err, req, res, next) {

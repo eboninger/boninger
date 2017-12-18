@@ -1,3 +1,37 @@
-<p>
-  home works!
-</p>
+<div class="container tracklist">
+    <table class="table table-responsive table-hover">
+        <thead>
+            <tr>
+                <th>Position</th>
+                <th>Track</th>
+                <th></th>
+                <th>Time On Chart</th>
+                <th>Previous Position</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let track of tracks; let i = index;">
+                <th scope="row">
+                    {{i+1}}
+                    <td>
+                        <a [attr.href]="track?.album?.url">
+                            <img title="Open In Spotify" alt="Open In Spotify" [attr.src]="track?.album?.small_image">
+                        </a>
+                    </td>
+                    <td class="open-in-spotify-links">
+                        <div>
+                            <a title="Open In Spotify" [attr.href]="track?.url">{{track?.name}}</a>
+                        </div>
+                        <div>
+                            <span class="tight-artist" *ngFor="let artist of track?.artists; let isLast = last;">
+                                <a title="Open In Spotify" [attr.href]="artist?.url">{{artist?.name}}{{isLast ? '' : ', '}}</a>
+                            </span>
+                        </div>
+                        <div>
+                            <a title="Open In Spotify" [attr.href]="track?.album?.url">{{track?.album?.name}}</a>
+                        </div>
+                    </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
