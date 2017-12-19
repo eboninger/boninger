@@ -13,7 +13,7 @@ aws.config.update({ region: 'us-east-1' });
 const stateKey = 'spotify_auth_state';
 const dynamodb = new aws.DynamoDB();
 
-router.use(ipfilter(['34.237.114.155'], { mode: 'allow' }));
+router.use(ipfilter(['127.0.0.1'], { mode: 'allow' }));
 router.use(jwt.init(spotify.X));
 
 var generateRandomString = function(length) {
