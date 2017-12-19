@@ -13,7 +13,7 @@ aws.config.update({ region: 'us-east-1' });
 const stateKey = 'spotify_auth_state';
 const dynamodb = new aws.DynamoDB();
 
-router.use(ipfilter(['127.0.0.1'], { mode: 'allow' }));
+// router.use(ipfilter(['127.0.0.1'], { mode: 'allow' }));
 router.use(jwt.init(spotify.X));
 
 var generateRandomString = function(length) {
@@ -60,49 +60,50 @@ router.get('/callback', function(req, res) {
       json: true
     };
 
-    request.post(authOptions, function(error, response, body) {
-      if (!error && response.statusCode === 200) {
-        const access_token = body.access_token;
-        const refresh_token = body.refresh_token;
-
-        const options = {
-          url: 'https://api.spotify.com/v1/me',
-          headers: { Authorization: 'Bearer ' + access_token },
-          json: true
-        };
-
-        request.get(options, function(error, response, body) {
-          if (!body.uri) {
-            res.direct('/home?error=no_user_data');
-          } else if (!spotify.ACCEPT.includes(body.id)) {
-            res.sendStatus(403);
-          } else {
-            const params = {
-              Key: { spotify_uri: { S: body.uri } },
-              ExpressionAttributeNames: { '#RT': 'refresh_token' },
-              ExpressionAttributeValues: { ':rt': { S: refresh_token } },
-              ReturnConsumedCapacity: 'TOTAL',
-              TableName: 'billboard_user',
-              UpdateExpression: 'SET #RT = :rt'
-            };
-            dynamodb.updateItem(params, (err, data) => {
-              if (err) {
-                console.log(err, err.stack);
-              } else {
-                console.log(data);
-              }
-              const token = res.jwt({
-                spotify_uri: body.uri,
-                access_token: access_token
-              });
-              res.redirect('/home');
-            });
-          }
-        });
-      }
-    });
+    getTokenCheckUser(authOptions, res);
   }
 });
+
+const getTokenCheckUser = (authOptions, res) => {
+  request.post(authOptions, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      const access_token = body.access_token;
+      const refresh_token = body.refresh_token;
+
+      const options = {
+        url: 'https://api.spotify.com/v1/me',
+        headers: { Authorization: 'Bearer ' + access_token },
+        json: true
+      };
+
+      request.get(options, function(error, response, body) {
+        if (!body.uri) {
+          res.direct('/home?error=no_user_data');
+        } else if (!spotify.ACCEPT.includes(body.id)) {
+          res.redirect('/na');
+        } else {
+          const params = {
+            Key: { spotify_uri: { S: body.uri } },
+            ExpressionAttributeNames: { '#RT': 'refresh_token' },
+            ExpressionAttributeValues: { ':rt': { S: refresh_token } },
+            ReturnConsumedCapacity: 'TOTAL',
+            TableName: 'billboard_user',
+            UpdateExpression: 'SET #RT = :rt'
+          };
+          dynamodb.updateItem(params, (err, data) => {
+            if (err) {
+              console.log(err, err.stack);
+            } else {
+              console.log(data);
+            }
+            const token = res.jwt({ spotify_uri: body.uri, access_token: access_token });
+            res.redirect('/home');
+          });
+        }
+      });
+    }
+  });
+};
 
 router.get('/authorize', jwt.active(), function(req, res) {
   res.send(true);

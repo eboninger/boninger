@@ -11,9 +11,10 @@ import { HomeComponent } from './components/home/home.component';
 
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from './services/auth.service';
+import { NoAccessComponent } from './components/no-access/no-access.component';
 
 @NgModule({
-  declarations: [AppComponent, NavComponent, RegisterComponent, HomeComponent],
+  declarations: [AppComponent, NavComponent, RegisterComponent, HomeComponent, NoAccessComponent],
   imports: [BrowserModule, AppRoutingModule, NgbModule.forRoot(), HttpClientModule],
   providers: [AuthService, CookieService],
   bootstrap: [AppComponent]
