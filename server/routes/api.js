@@ -112,7 +112,7 @@ router.get('/songs', jwt.active(), function(req, res) {
   const token = req.jwt;
   const params = { Key: { spotify_uri: { S: token.payload.spotify_uri } }, TableName: 'billboard_user' };
   dynamodb.getItem(params, (err, data) => {
-    if (data.Item.song_list.L.length <= 0) {
+    if (data.Item.song_list && data.Item.song_list.L.length <= 0) {
       const options = {
         url: 'https://api.spotify.com/v1/me/top/tracks?limit=50&time_range=short_term',
         headers: { Authorization: 'Bearer ' + token.payload.access_token },
